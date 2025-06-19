@@ -6,7 +6,8 @@
   <title>Real Estate ROI Calculator</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
-    .calculator { border: 1px solid #ccc; border-radius: 5px; padding: 20px; margin-bottom: 20px; }
+    .container { display: flex; gap: 20px; }
+    .calculator { flex: 1; border: 1px solid #ccc; border-radius: 5px; padding: 20px; }
     .calculator h2 { margin-top: 0; }
     .form-group { margin-bottom: 10px; }
     label { display: block; margin-bottom: 5px; }
@@ -14,87 +15,114 @@
     .buttons { margin-top: 15px; }
     button { padding: 8px 12px; margin-right: 8px; }
     .result { margin-top: 15px; font-weight: bold; }
+    #log-zone { flex: 1; border: 1px solid #ccc; border-radius: 5px; padding: 20px; max-height: 600px; overflow-y: auto; background: #f9f9f9; }
+    #log-zone h3 { margin-top: 0; }
+    #log-content { list-style: disc inside; padding-left: 0; }
   </style>
 </head>
 <body>
 
   <h1>Real Estate Investment ROI Calculator</h1>
+  <div class="container">
+    <!-- Left: Forms -->
+    <div>
+      <!-- Rent Scenario -->
+      <div class="calculator" id="rent-calculator">
+        <h2>Rent Scenario</h2>
+        <div class="form-group">
+          <label>Original Price</label>
+          <input type="number" id="rent-original-price" placeholder="e.g. 500000">
+        </div>
+        <div class="form-group">
+          <label>Service Charges (per sq ft)</label>
+          <input type="number" id="rent-service-charges" placeholder="e.g. 5">
+        </div>
+        <div class="form-group">
+          <label>Admin Fee</label>
+          <input type="number" id="rent-admin-fee" placeholder="e.g. 2000">
+        </div>
+        <div class="form-group">
+          <label>Rental Price (Annual)</label>
+          <input type="number" id="rent-rental-price" placeholder="e.g. 30000">
+        </div>
+        <div class="form-group">
+          <label>Unit Size (sq ft)</label>
+          <input type="number" id="rent-size" placeholder="e.g. 1000">
+        </div>
+        <div class="form-group">
+          <label>DLD Fee (%)</label>
+          <input type="number" id="rent-dld-percent" placeholder="e.g. 1">
+        </div>
+        <div class="buttons">
+          <button onclick="calculateRentROI()">Calculate</button>
+          <button onclick="clearRent()">Clear</button>
+        </div>
+        <div class="result" id="rent-result"></div>
+      </div>
 
-  <!-- Rent Scenario -->
-  <div class="calculator" id="rent-calculator">
-    <h2>Rent Scenario</h2>
-    <div class="form-group">
-      <label>Original Price</label>
-      <input type="number" id="rent-original-price" placeholder="e.g. 500000">
+      <!-- Resell Scenario -->
+      <div class="calculator" id="resale-calculator">
+        <h2>Resell Scenario</h2>
+        <div class="form-group">
+          <label>Original Price</label>
+          <input type="number" id="res-original-price" placeholder="e.g. 500000">
+        </div>
+        <div class="form-group">
+          <label>Selling Price</label>
+          <input type="number" id="res-selling-price" placeholder="e.g. 550000">
+        </div>
+        <div class="form-group">
+          <label>Admin Fee</label>
+          <input type="number" id="res-admin-fee" placeholder="e.g. 2000">
+        </div>
+        <div class="form-group">
+          <label>% Paid to Developer</label>
+          <input type="number" id="res-developer-percent" placeholder="e.g. 70">
+        </div>
+        <div class="form-group">
+          <label>DLD Fee (%)</label>
+          <input type="number" id="res-dld-percent" placeholder="e.g. 1">
+        </div>
+        <div class="form-group">
+          <label>Commission (%)</label>
+          <input type="number" id="res-commission-percent" placeholder="e.g. 2">
+        </div>
+        <div class="form-group">
+          <label>NOC Fee</label>
+          <input type="number" id="res-noc-fee" placeholder="e.g. 1000">
+        </div>
+        <div class="buttons">
+          <button onclick="calculateResaleROI()">Calculate</button>
+          <button onclick="clearResale()">Clear</button>
+        </div>
+        <div class="result" id="resale-result"></div>
+      </div>
     </div>
-    <div class="form-group">
-      <label>Service Charges (per sq ft)</label>
-      <input type="number" id="rent-service-charges" placeholder="e.g. 5">
-    </div>
-    <div class="form-group">
-      <label>Admin Fee</label>
-      <input type="number" id="rent-admin-fee" placeholder="e.g. 2000">
-    </div>
-    <div class="form-group">
-      <label>Rental Price (Annual)</label>
-      <input type="number" id="rent-rental-price" placeholder="e.g. 30000">
-    </div>
-    <div class="form-group">
-      <label>Unit Size (sq ft)</label>
-      <input type="number" id="rent-size" placeholder="e.g. 1000">
-    </div>
-    <div class="form-group">
-      <label>DLD Fee (%)</label>
-      <input type="number" id="rent-dld-percent" placeholder="e.g. 1">
-    </div>
-    <div class="buttons">
-      <button onclick="calculateRentROI()">Calculate</button>
-      <button onclick="clearRent()">Clear</button>
-    </div>
-    <div class="result" id="rent-result"></div>
-  </div>
 
-  <!-- Resell Scenario -->
-  <div class="calculator" id="resale-calculator">
-    <h2>Resell Scenario</h2>
-    <div class="form-group">
-      <label>Original Price</label>
-      <input type="number" id="res-original-price" placeholder="e.g. 500000">
+    <!-- Right: Calculation Log -->
+    <div id="log-zone">
+      <h3>Calculation Steps</h3>
+      <ul id="log-content">
+        <li>Press "Calculate" to see the steps.</li>
+      </ul>
     </div>
-    <div class="form-group">
-      <label>Selling Price</label>
-      <input type="number" id="res-selling-price" placeholder="e.g. 550000">
-    </div>
-    <div class="form-group">
-      <label>Admin Fee</label>
-      <input type="number" id="res-admin-fee" placeholder="e.g. 2000">
-    </div>
-    <div class="form-group">
-      <label>% Paid to Developer</label>
-      <input type="number" id="res-developer-percent" placeholder="e.g. 70">
-    </div>
-    <div class="form-group">
-      <label>DLD Fee (%)</label>
-      <input type="number" id="res-dld-percent" placeholder="e.g. 1">
-    </div>
-    <div class="form-group">
-      <label>Commission (%)</label>
-      <input type="number" id="res-commission-percent" placeholder="e.g. 2">
-    </div>
-    <div class="form-group">
-      <label>NOC Fee</label>
-      <input type="number" id="res-noc-fee" placeholder="e.g. 1000">
-    </div>
-    <div class="buttons">
-      <button onclick="calculateResaleROI()">Calculate</button>
-      <button onclick="clearResale()">Clear</button>
-    </div>
-    <div class="result" id="resale-result"></div>
   </div>
 
   <script>
-    // Rent ROI
+    function log(message) {
+      const lc = document.getElementById('log-content');
+      const li = document.createElement('li');
+      li.textContent = message;
+      lc.appendChild(li);
+    }
+
+    function clearLog() {
+      const lc = document.getElementById('log-content');
+      lc.innerHTML = '';
+    }
+
     function calculateRentROI() {
+      clearLog();
       const P = +document.getElementById('rent-original-price').value || 0;
       const S = +document.getElementById('rent-service-charges').value || 0;
       const A = +document.getElementById('rent-admin-fee').value || 0;
@@ -103,21 +131,31 @@
       const dldPct = +document.getElementById('rent-dld-percent').value || 0;
 
       const D = (P * dldPct / 100);
-      const totalCost = P + A + D;
-      const netProfit = R - (S * U);
-      const roi = totalCost ? (netProfit / totalCost) * 100 : 0;
+      log(`DLD Fee: ${dldPct}% of ${P} = ${D.toFixed(2)}`);
 
-      document.getElementById('rent-result').textContent = 
-        `ROI: ${roi.toFixed(2)}%`;
+      const totalCost = P + A + D;
+      log(`Total Cost = Original Price (${P}) + Admin Fee (${A}) + DLD (${D.toFixed(2)}) = ${totalCost.toFixed(2)}`);
+
+      const serviceTotal = S * U;
+      log(`Service Charges = ${S} * ${U} = ${serviceTotal.toFixed(2)}`);
+
+      const netProfit = R - serviceTotal;
+      log(`Net Profit = Rental Income (${R}) - Service Charges (${serviceTotal.toFixed(2)}) = ${netProfit.toFixed(2)}`);
+
+      const roi = totalCost ? (netProfit / totalCost) * 100 : 0;
+      log(`ROI = (Net Profit / Total Cost) * 100 = (${netProfit.toFixed(2)} / ${totalCost.toFixed(2)}) * 100 = ${roi.toFixed(2)}%`);
+
+      document.getElementById('rent-result').textContent = `ROI: ${roi.toFixed(2)}%`;
     }
 
     function clearRent() {
       document.querySelectorAll('#rent-calculator input').forEach(i => i.value = '');
       document.getElementById('rent-result').textContent = '';
+      clearLog();
     }
 
-    // Resale ROI
     function calculateResaleROI() {
+      clearLog();
       const P   = +document.getElementById('res-original-price').value || 0;
       const SP  = +document.getElementById('res-selling-price').value || 0;
       const A   = +document.getElementById('res-admin-fee').value || 0;
@@ -127,21 +165,36 @@
       const N   = +document.getElementById('res-noc-fee').value || 0;
 
       const paidDev = P * (DP / 100);
-      const leftDev = P - paidDev;
-      const D = (P * dldPct / 100);
-      const commission = SP * (C / 100);
-      const totalCost = paidDev + A + D + N + commission;
-      const grossProfit = SP - leftDev;
-      const netProfit = grossProfit - totalCost;
-      const roi = totalCost ? (netProfit / totalCost) * 100 : 0;
+      log(`Paid to Developer: ${DP}% of ${P} = ${paidDev.toFixed(2)}`);
 
-      document.getElementById('resale-result').textContent =
-        `ROI: ${roi.toFixed(2)}%`;
+      const leftDev = P - paidDev;
+      log(`Remaining Developer Balance = Original Price (${P}) - Paid (${paidDev.toFixed(2)}) = ${leftDev.toFixed(2)}`);
+
+      const D = (P * dldPct / 100);
+      log(`DLD Fee: ${dldPct}% of ${P} = ${D.toFixed(2)}`);
+
+      const commission = SP * (C / 100);
+      log(`Commission: ${C}% of ${SP} = ${commission.toFixed(2)}`);
+
+      const totalCost = paidDev + A + D + N + commission;
+      log(`Total Cost = Paid Dev (${paidDev.toFixed(2)}) + Admin Fee (${A}) + DLD (${D.toFixed(2)}) + NOC (${N}) + Commission (${commission.toFixed(2)}) = ${totalCost.toFixed(2)}`);
+
+      const grossProfit = SP - leftDev;
+      log(`Gross Profit = Selling Price (${SP}) - Remaining Dev Balance (${leftDev.toFixed(2)}) = ${grossProfit.toFixed(2)}`);
+
+      const netProfit = grossProfit - totalCost;
+      log(`Net Profit = Gross Profit (${grossProfit.toFixed(2)}) - Total Cost (${totalCost.toFixed(2)}) = ${netProfit.toFixed(2)}`);
+
+      const roi = totalCost ? (netProfit / totalCost) * 100 : 0;
+      log(`ROI = (Net Profit / Total Cost) * 100 = (${netProfit.toFixed(2)} / ${totalCost.toFixed(2)}) * 100 = ${roi.toFixed(2)}%`);
+
+      document.getElementById('resale-result').textContent = `ROI: ${roi.toFixed(2)}%`;
     }
 
     function clearResale() {
       document.querySelectorAll('#resale-calculator input').forEach(i => i.value = '');
       document.getElementById('resale-result').textContent = '';
+      clearLog();
     }
   </script>
 </body>
